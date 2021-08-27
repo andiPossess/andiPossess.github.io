@@ -4,14 +4,30 @@
         @import url('https://fonts.googleapis.com/css2?family=Poller+One&display=swap');
 
         body {
-            width: 40em;
+            width: 48em;
             margin: 1em auto;
 
             font-size: 16pt;
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 
-            background: #5f3397;
+            background: rgb(18,18,19);
+            background: linear-gradient(176deg, rgba(40,40,42,1) 25%, rgba(67,67,70,1) 94%);
+            background-attachment: fixed;
             color: #eeeeee;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        section {
+            display: flexbox;
+            background: rgb(104,42,161);
+            background: linear-gradient(141deg, rgba(104,42,161,1) 25%, rgba(109,44,161,1) 74%);
+            padding: 2em;
+            margin-top: 1em;
+
+            border-radius: 20px;
+            box-shadow: 10px 6px 24px 0px rgba(30, 26, 31, 0.4);
         }
 
         h1, h2, h3 { 
@@ -23,12 +39,24 @@
             text-transform: uppercase;
             text-align: center;
             font-size: 3em;
+
         }
 
         h2 {
             font-family: 'Poller One', cursive;
             text-transform: uppercase;
             text-align: center;
+            margin-top: 0;
+            font-size: 2.2em;
+        }
+
+        h1 > div {
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-size: 16pt;
+            text-transform: none;
+            font-weight: normal;
+            margin-top: 1em;
+            -webkit-text-stroke: 0;
         }
 
         textarea, input {
@@ -90,47 +118,65 @@
             background: #ff7ddf;
             transform: scale(1.1);
         }
+
+        code {
+            color: #6bd5ff;
+            padding: 3px 6px;
+            background: #000000;
+            border-radius: 5px;
+            font-size: 14px;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Selen Neck<br />Generator</h1> 
-    <textarea id="inputtext"></textarea>
+    <h1>Selen Neck<br />Generator
+    <div>Generate a path using the Selen Tatsuki fan discord's Selen neck emotes.</div>
+    </h1> 
 
-    <button onclick="onConvert()">Convert</button>
+    <section>
+        <h2>Path Designer</h2>
+        <textarea id="inputtext"></textarea>
 
-    <textarea id="outputtext"></textarea>
+        <button onclick="onConvert()">Convert</button>
 
-    <br />
-    Filler emotes (put each on its own line)
-    <textarea id="filler"></textarea>
-    <br />
-    Car count
-    Min: <input id="carmin" type="number" onchange="updateCarRange()"/> Max: <input id="carmax" type="number" onchange="updateCarRange()"/>
+        <textarea id="outputtext"></textarea>
+    </section>
 
-    <h2>How to use</h2>
-    <ul>
-        <li>A path must begin with <code>X</code> (the torso) and end with <code>O</code> (the head).<br />
-            Currently there is a bug that requires the torso to have an additional up marker above it to function.</li>
-        <li>Various markers indicate direction the path will follow starting from the X. <br />
-            <code>&lt;</code> is left. <br />
-            <code>&gt;</code> is right. <br />
-            <code>^</code> is up. <br />
-            <code>v</code> (lowercase v) is down.
-        </li>
-        <li>The path will follow the direction of the marker to find the next marker and the next and so on until
-            the path ends, either by becoming invalid or by reaching the head.
-        </li>
-        <li>A path is considered invalid if a marker points to a blank space or the path loops in on itself.</li>
-        <li>
-            Blank spaces should be filled in using the filler emotes panel. Each blank space will randomly select
-            one emote from that list. Duplicates of an emote can be used to change the weighting.
-        </li>
-        <li>
-            Cars can be randomly placed on regular vertical paths. Car count is a randomly seletced number within
-            the given range.
-        </li>
-    </ul>
+    <section>
+        <h2>Options</h2>
+        Filler emotes (put each on its own line)
+        <textarea id="filler"></textarea>
+        <br />
+        Car count
+        Min: <input id="carmin" type="number" onchange="updateCarRange()"/> Max: <input id="carmax" type="number" onchange="updateCarRange()"/>
+    </section>
+
+    <section>
+        <h2>How to use</h2>
+        <ul>
+            <li>A path must begin with <code>X</code> (the torso) and end with <code>O</code> (the head).<br />
+                Currently there is a bug that requires the torso to have an additional up marker above it to function.</li>
+            <li>Various markers indicate direction the path will follow starting from the <code>X</code>. <br />
+                <code>&lt;</code> is left. <br />
+                <code>&gt;</code> is right. <br />
+                <code>^</code> is up. <br />
+                <code>v</code> (lowercase v) is down.
+            </li>
+            <li>The path will follow the direction of the marker to find the next marker and the next and so on until
+                the path ends, either by becoming invalid or by reaching the head.
+            </li>
+            <li>A path is considered invalid if a marker points to a blank space or the path loops in on itself.</li>
+            <li>
+                Blank spaces should be filled in using the filler emotes panel. Each blank space will randomly select
+                one emote from that list. Duplicates of an emote can be used to change the weighting.
+            </li>
+            <li>
+                Cars can be randomly placed on regular vertical paths. Car count is a randomly seletced number within
+                the given range.
+            </li>
+        </ul>
+    </section>
 
     <script>
         var neckEmotes = [
