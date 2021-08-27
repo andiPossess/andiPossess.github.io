@@ -1,0 +1,243 @@
+<html>
+<body>
+<style>
+    body {
+        width: 80em;
+        margin: auto;
+    }
+    textarea {
+        display: block;
+        width: 100%;
+        min-height: 20em;
+    }
+</style>
+
+    <h1>Selen Neck</h1> 
+    <textarea id="inputtext"></textarea>
+
+    <button onclick="onConvert()">Convert</button>
+
+    <textarea id="outputtext"></textarea>
+
+
+
+    <script>
+        var neckEmotes = [
+            "__",
+            "SelenNeck4",
+            "SelenNeck",
+            "SelenNeckHorizontal",
+            "SelenNeckCorner1", 
+            "SelenNeckCorner2",
+            "SelenNeckCorner3",
+            "SelenNeckCorner4",
+            "SelenNeck3",
+            "SelenNeck2",
+            "SelenNeckCar"
+        ]
+
+        var neckPieces = {
+            "torso": { "emote": "SelenNeck4", "id": 1 },
+            "head": { "emote": "SelenNeck", "id": 2 },
+            "horizontal": { "emote": "SelenNeckHorizontal", "id": 3 },
+            "tlcorner": { "emote": "SelenNeckCorner1", "id": 4 },
+            "trcorner": { "emote": "SelenNeckCorner2", "id": 5 },
+            "blcorner": { "emote": "SelenNeckCorner3", "id": 6 },
+            "brcorner": { "emote": "SelenNeckCorner4", "id": 7 },
+            "vertical": { "emote": "SelenNeck3", "id": 8 },
+            "neck": { "emote": "SelenNeck2", "id": 9 },
+            "car": { "emote": "SelenNeckCar", "id": 10 },
+        }
+
+        var neckConnections = {
+            "start": { "up": "torso" },
+            "up": {"up": "vertical", "right": "tlcorner", "left": "trcorner", "end": "head" },
+            "down": {"down": "vertical", "right": "blcorner", "left": "brcorner" },
+            "left": {"left": "horizontal", "up": "blcorner", "down": "tlcorner" },
+            "right": {"right": "horizontal", "up": "brcorner", "down": "trcorner" },
+        }
+
+        var charToDir = {
+            "X": "start",
+            "O": "end",
+            "^": "up",
+            "v": "down",
+            "<": "left",
+            ">": "right"
+        };
+
+        var inputTextArea = document.getElementById("inputtext");
+        var outputTextArea = document.getElementById("outputtext");
+
+        function onConvert()
+        {
+            var inputText = inputTextArea.value;
+
+            var map = trimEmptyLines(inputText.split("\n").map(x => x.trimEnd()));
+
+            var finalMap = finalizeMap(plot(trace(map)));
+            outputTextArea.value = finalMap;
+        }
+
+        function getNextPos(direction, x, y)
+        {
+            var dir = [0, 0];
+            switch (direction) {
+                case "start": dir = [0, -1]; break;
+                case "up": dir = [0, -1]; break;
+                case "down": dir = [0, 1]; break;
+                case "left": dir = [-1, 0]; break;
+                case "right": dir = [1, 0]; break;
+            }
+            return { "x": x + dir[0], "y": y + dir[1] };
+        }
+
+        function trace(map)
+        {
+            var startingPoint = findCoordinates(map, "X");
+            var endingPoint = findCoordinates(map, "O");
+
+            var path = [];
+
+            path.push({"x": startingPoint.x, "y": startingPoint.y, "value": "start" });
+
+            while (true)
+            {
+                // Get valid moves from previous position
+                var previous = path[path.length - 1];
+                if (previous.value == "end") break;
+
+                var nextPos = getNextPos(previous.value, previous.x, previous.y);
+                var nextValue = charToDir[map[nextPos.y][nextPos.x]];
+
+                var validDirections = Object.keys(neckConnections[previous.value]);
+
+                if (!validDirections.includes(nextValue))
+                {
+                    console.log("invalid direction");
+                    break;
+                }
+
+                path.push({"x": nextPos.x, "y": nextPos.y, "value": nextValue});
+
+                if (path.length > 200) break;
+            }
+
+            return path;
+        }
+
+        function plot(traced)
+        {
+            var previous = null;
+            var total = [];
+            for (var i = 0; i < traced.length; i++)
+            {
+                var result = traced[i];
+                if (previous)
+                {
+                    var connection = neckConnections[previous.value][result.value];
+
+                    // edge case for head neck connection
+                    if (connection == "head" && total.length > 0 && total[total.length - 1].neckpiece == "vertical")
+                    {
+                        total[total.length - 1].neckpiece = "neck";
+                    }
+
+                    total.push( {"x": result.x, "y": result.y, "neckpiece": connection });
+                }
+                previous = result;
+            };
+
+            var map = [];
+            for (var i = 0; i < total.length; i++)
+            {
+                var v = total[i];
+                var x = v.x;
+                var y = v.y;
+
+                while (map.length <= v.y) map.push([]);
+                
+                var row = map[v.y];
+                while (row.length <= v.x) row.push(0);
+
+                map[y][x] = neckPieces[v.neckpiece].id;
+            }
+
+            return map;
+        }
+
+        function finalizeMap(plotted)
+        {
+            var f = plotted.map(x => {
+                return x.map(y => ":" + neckEmotes[y] + ":").join("");
+            }).join("\n");
+
+            return f;
+        }
+
+        function getDimensions(map)
+        {
+            var y = map.length;
+            var x = map.map(x => x.length).reduce((x, y) => Math.max(x, y));
+            return { "width": x, "height": y };
+        }
+
+        function trimEmptyLines(splitText)
+        {
+            var lineCount = 0;
+            for (var i = 0; i < splitText.length; i++)
+            {
+                if (splitText[i].trim() != "") break;
+                lineCount++;
+            }
+
+            if (lineCount > 0) splitText.splice(0, lineCount);
+            lineCount = 0;
+
+            for (var i = splitText.length - 1; i >= 0; i--)
+            {
+                if (splitText[i].trim() != "") break;
+                lineCount++;
+            }
+
+            if (lineCount > 0) splitText.splice(splitText.length - lineCount, lineCount);
+
+            var leftTrim = splitText.reduce((trim, line) => Math.min(line.length - line.trimStart().length, trim), 50000);
+            console.log(leftTrim);
+
+            if (leftTrim > 0) splitText = splitText.map(x => x.slice(leftTrim));
+            console.log(splitText);
+
+            return splitText;
+        }
+
+        function findCoordinates(map, marker)
+        {
+            for (var i = 0; i < map.length; i++)
+            {
+                var index = map[i].indexOf(marker);
+                if (index >= 0) return { "x": index, "y": i };
+            }
+        }
+
+    </script>
+</body>
+
+
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
