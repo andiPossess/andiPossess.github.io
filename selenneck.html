@@ -1,35 +1,117 @@
 <html>
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poller+One&display=swap');
+
+        body {
+            width: 40em;
+            margin: 1em auto;
+
+            font-size: 16pt;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+            background: #5f3397;
+            color: #eeeeee;
+        }
+
+        h1, h2, h3 { 
+            color: white;
+        }
+
+        h1 {
+            font-family: 'Poller One', cursive;
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 3em;
+        }
+
+        h2 {
+            font-family: 'Poller One', cursive;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        textarea, input {
+            font-size: 14pt;
+
+            background: #303030;
+
+            border: 5px solid #be1c75;
+            border-radius: 16px;
+            outline: none;
+
+            color: #6bd5ff;
+
+            box-shadow: 10px 6px 24px 0px rgba(30, 26, 31, 0.4);
+            transition: transform 0.1s;
+        }
+
+        textarea:focus, input:focus {
+            transform: scale(1.01);
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            min-height: 15em;
+
+            padding: 1em;
+        }
+
+        textarea#filler {
+            width: 20em;
+            min-height: 10em;
+        }
+
+        input {
+            padding: 1em;
+            height: 1.5em;
+        }
+
+        button {
+            padding: 0.8em;
+            font-size: 20pt;
+            margin: 0.5em auto;
+            display: block;
+
+            box-shadow: 10px 6px 24px 0px rgba(30, 26, 31, 0.4);
+
+            outline: none;
+            background: #be1c75;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        button:active {
+            background: #ff7ddf;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
 <body>
-<style>
-    body {
-        width: 80em;
-        margin: auto;
-    }
-    textarea {
-        display: block;
-        width: 100%;
-        min-height: 20em;
-    }
-
-    textarea#filler {
-        width: 20em;
-    }
-</style>
-
-    <h1>Selen Neck</h1> 
+    <h1>Selen Neck<br />Generator</h1> 
     <textarea id="inputtext"></textarea>
 
     <button onclick="onConvert()">Convert</button>
 
     <textarea id="outputtext"></textarea>
 
+    <br />
     Filler emotes (put each on its own line)
     <textarea id="filler"></textarea>
+    <br />
+    Car count
+    Min: <input id="carmin" type="number" onchange="updateCarRange()"/> Max: <input id="carmax" type="number" onchange="updateCarRange()"/>
 
     <h2>How to use</h2>
     <ul>
         <li>A path must begin with <code>X</code> (the torso) and end with <code>O</code> (the head).<br />
-            Currently there is a bug that requires the torso to have an additional up marker above it to funciton.</li>
+            Currently there is a bug that requires the torso to have an additional up marker above it to function.</li>
         <li>Various markers indicate direction the path will follow starting from the X. <br />
             <code>&lt;</code> is left. <br />
             <code>&gt;</code> is right. <br />
@@ -43,6 +125,10 @@
         <li>
             Blank spaces should be filled in using the filler emotes panel. Each blank space will randomly select
             one emote from that list. Duplicates of an emote can be used to change the weighting.
+        </li>
+        <li>
+            Cars can be randomly placed on regular vertical paths. Car count is a randomly seletced number within
+            the given range.
         </li>
     </ul>
 
@@ -94,6 +180,20 @@
         var inputTextArea = document.getElementById("inputtext");
         var outputTextArea = document.getElementById("outputtext");
         var fillerTextArea = document.getElementById("filler");
+        var carMinInput = document.getElementById("carmin");
+        var carMaxInput = document.getElementById("carmax");
+
+        function updateCarRange()
+        {
+            var min = Number(carMinInput.value);
+            var max = Number(carMaxInput.value);
+
+            if (min < 0) min = 0;
+            if (max < min) max = min;
+
+            carMinInput.value = String(min);
+            carMaxInput.value = String(max);
+        }
 
         function onConvert()
         {
@@ -175,6 +275,8 @@
                 previous = result;
             };
 
+            addCars(total);
+
             var map = [];
             for (var i = 0; i < total.length; i++)
             {
@@ -191,6 +293,33 @@
             }
 
             return map;
+        }
+
+        function addCars(path)
+        {
+            var min = Number(carMinInput.value);
+            var max = Number(carMaxInput.value);
+
+            var count = Math.floor((Math.random() * (max + 1 - min))) + min;
+            if (count > path.length) count = path.length;
+
+            for (var i = 0; i < count; i++)
+            {
+                addCar(path);
+            }
+        }
+
+        function addCar(path)
+        {
+            var pCounter = 0;
+            var chosenIndex = -1;
+            for (var i = 0; i < path.length; i++)
+            {
+                if (path[i].neckpiece != "vertical") continue;
+                pCounter++;
+                chosenIndex = Math.random() < (1 / pCounter) ? i : chosenIndex;
+            }
+            if (chosenIndex >= 0) path[chosenIndex].neckpiece = "car";
         }
 
         function finalizeMap(plotted, fillers)
