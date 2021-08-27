@@ -4,7 +4,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Poller+One&display=swap');
 
         body {
-            width: 48em;
+            width: 44em;
             margin: 1em auto;
 
             font-size: 16pt;
@@ -25,8 +25,9 @@
             background: linear-gradient(141deg, rgba(104,42,161,1) 25%, rgba(109,44,161,1) 74%);
             padding: 2em;
             margin-top: 1em;
+            margin-bottom: 1em;
 
-            border-radius: 20px;
+            border: 12px solid rgb(160, 95, 233);
             box-shadow: 10px 6px 24px 0px rgba(30, 26, 31, 0.4);
         }
 
@@ -34,11 +35,22 @@
             color: white;
         }
 
+        header {
+            text-align: center;
+        }
+
         h1 {
             font-family: 'Poller One', cursive;
             text-transform: uppercase;
             text-align: center;
             font-size: 3em;
+
+            margin: 0.4em auto;
+            width: fit-content;
+
+            background: rgb(224, 42, 133);
+            box-shadow: 10px 6px 14px 0px rgba(30, 26, 31, 0.3);
+            padding: 0.5em;
 
         }
 
@@ -48,6 +60,14 @@
             text-align: center;
             margin-top: 0;
             font-size: 2.2em;
+
+            width: fit-content;
+
+            background: rgb(224, 42, 133);
+            box-shadow: 10px 6px 14px 0px rgba(30, 26, 31, 0.3);
+            padding: 0.2em 0.4em;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         h1 > div {
@@ -59,13 +79,12 @@
             -webkit-text-stroke: 0;
         }
 
-        textarea, input {
+        textarea, input, pre.codeblock {
             font-size: 14pt;
 
             background: #303030;
 
             border: 5px solid #be1c75;
-            border-radius: 16px;
             outline: none;
 
             color: #6bd5ff;
@@ -126,13 +145,24 @@
             border-radius: 5px;
             font-size: 14px;
         }
+
+        pre.codeblock {
+            padding: 1em;
+            text-indent: 0;
+        }
+
+        pre > code {
+            background: none;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Selen Neck<br />Generator
+    <header><h1>Selen Neck<br />Generator</h1>
     <div>Generate a path using the Selen Tatsuki fan discord's Selen neck emotes.</div>
-    </h1> 
+    </header> 
 
     <section>
         <h2>Path Designer</h2>
@@ -175,7 +205,17 @@
                 Cars can be randomly placed on regular vertical paths. Car count is a randomly seletced number within
                 the given range.
             </li>
+
         </ul>
+
+        Example usage:
+        <pre class='codeblock'><code>O
+^
+^&lt;&lt;  v&lt;&lt;
+  ^  v ^
+  ^&lt;&lt;&lt; ^
+       X
+            </code></pre>
     </section>
 
     <script>
